@@ -1,0 +1,11 @@
+boto3
+botocore
+python-dotenv
+psycopg2-binary
+numpy 
+pandas
+scikit-learn
+pika
+imblearn
+botocore
+statsmodels
