@@ -26,6 +26,8 @@ ROUTING_KEY  = os.getenv("ROUTING_KEY")
 RABBIT_LOCAL  = os.getenv("RABBIT_LOCAL")
 PREFETCH_COUNT = 1
 EXCHANGE_TYPE = "direct"
+ERROR = "ERROR"
+DONE = "DONE"
 
 def create_callback(db):
     def on_message_test(channel, method, properties, body):
@@ -54,14 +56,14 @@ def create_callback(db):
         try:
             js = json.dumps(df)
             s3 = S3Instance("tracker-student-reports")
-            s3.put_object(client.get_output_key(), js)
-            db.update_event_queue(('DONE', client.get_output_key()))
+            ### utf-8 will make it convertable on the frontend Parsable
+            s3.put_object(client.get_output_key(), js.encode('utf-8'))
+            db.update_event_queue((DONE, client.get_output_key()))
             channel.basic_ack(delivery_tag=method.delivery_tag)
         except TypeError as e:
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-        
-
-
+            db.update_event_queue((ERROR, client.get_output_key()))
+            
     return on_message_test
 
         

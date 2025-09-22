@@ -4,6 +4,7 @@ import pandas as pd
 from collections import defaultdict
 import pickle
 import logging
+import math
 
 
 # --- Python logger ---
@@ -133,6 +134,9 @@ class AssessmentAnalysis:
         for key, value in moving_average.items():
             df = pd.Series(value)
             percent_change  = df.pct_change().fillna(0).mean()
+            if isinstance(percent_change, float):
+                if math.isinf(percent_change):
+                    percent_change = 0
             mean = df.mean()
             if key not in subjects:
                 subjects[key] = {"percent_change": percent_change, "mean": mean} 
